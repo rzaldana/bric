@@ -1,0 +1,6 @@
+[submodule "submodules/bgrim"]
+	path = submodules/bgrim
+	url = https://github.com/rzaldana/bgrim.git
+[submodule "submodules/blink"]
+	path = submodules/blink
+	url = https://github.com/rzaldana/blink.git
