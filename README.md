@@ -1,7 +1,7 @@
 # bric 🧱
 A lightweight Bash-based Lambda Runtime Interface 
 
-`bric` provides a minimal Lambda Runtime Interface implemented entirely in Bash. It’s designed for environments where simplicity, portability, and low overhead matter. 
+`bric` provides a minimal Lambda Runtime Interface implemented entirely in Bash. It’s designed for Lambda projects where quick iteration and simplicity matter. 
 
 ## Dependencies 📦
 The following tools and versions are known to work: 
