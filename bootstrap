@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# Get name of handler function
+HANDLER_FILE_PATH="${LAMBDA_TASK_ROOT}/${_HANDLER%.*}.bash" # remove everything after the last dot
+HANDLER_FUNCTION_NAME="${_HANDLER##*.}" # remove everything before the last dot
+
+# shellcheck disable=SC1090
+source "$HANDLER_FILE_PATH"
+
+__bootstrap_log() {
+  IFS= read -rd '' message
+  echo "$message" >&2
+}
+
+__bootstrap_export_header() {
+  local header_key="$1"
+  local header_value
+
+  header_value="$(
+    grep --fixed-strings --ignore-case "$header_key" \
+    | tr --delete '[:space:]' \
+    | cut --delimiter ':' --fields 2
+    )"
+
+  if [[ -z "$header_value" ]]; then
+    echo "header '$header_key' not found in response headers. Ignoring..." | __bootstrap_log 
+    return 0
+  fi
+
+  local env_var_name
+  # make all chars in header key upper case
+  env_var_name="${header_key^^}"
+  # replace all dashes with underscores
+  env_var_name="${env_var_name//-/_}"
+  export "${env_var_name}"="${header_value}"
+}
+
+while true
+do
+(
+  HEADERS="$(mktemp)"
+  trap 'rm -f "$HEADERS"' EXIT
+
+  # Get an event. The HTTP request will block until one is received
+  EVENT_DATA=$(curl -sS -LD "$HEADERS" "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/next")
+
+  # Export headers as env vars
+  __bootstrap_export_header 'Lambda-Runtime-Aws-Request-Id' <"$HEADERS"
+  __bootstrap_export_header 'Lambda-Runtime-Deadline-Ms' <"$HEADERS"
+  __bootstrap_export_header 'I-dontexist' <"$HEADERS"
+
+  # Run the handler function from the script
+  RESPONSE=$(echo "$EVENT_DATA" | "$HANDLER_FUNCTION_NAME")
+
+  curl -sSL "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/$LAMBDA_RUNTIME_AWS_REQUEST_ID/response"  -d "$RESPONSE" >/dev/null
+)
+done
