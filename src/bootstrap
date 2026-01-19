@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Source logging library
+source ../submodules/bgrim/bgrim.bash
+
 # Get name of handler function
 HANDLER_FILE_PATH="${LAMBDA_TASK_ROOT}/${_HANDLER%.*}.bash" # remove everything after the last dot
 HANDLER_FUNCTION_NAME="${_HANDLER##*.}" # remove everything before the last dot
@@ -7,11 +10,6 @@ HANDLER_FUNCTION_NAME="${_HANDLER##*.}" # remove everything before the last dot
 # shellcheck disable=SC1090
 # blink disable
 source "$HANDLER_FILE_PATH"
-
-__bootstrap_log() {
-  IFS= read -rd '' message
-  echo "$message" >&2
-}
 
 __bootstrap_export_header() {
   local header_key="$1"
@@ -24,7 +22,7 @@ __bootstrap_export_header() {
     )"
 
   if [[ -z "$header_value" ]]; then
-    echo "header '$header_key' not found in response headers. Ignoring..." | __bootstrap_log 
+    bg.log.warn "header '$header_key' not found in response headers. Ignoring..." 
     return 0
   fi
 

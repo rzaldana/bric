@@ -3,7 +3,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 _test.run_lambda_rie() {
   # Start Lambda Runtime Interface Emulator in background
-  aws-lambda-rie "${SCRIPT_DIR}/../bootstrap" &
+  aws-lambda-rie "${SCRIPT_DIR}/../bootstrap" >/dev/null 2>&1 &
   _AWS_LAMBDA_RIE_PID="$!"
   trap 'kill -s SIGTERM $_AWS_LAMBDA_RIE_PID' EXIT
   sleep 1
