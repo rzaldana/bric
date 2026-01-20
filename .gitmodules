@@ -1,0 +1,6 @@
+[submodule "submodules/blink"]
+	path = submodules/blink
+	url = https://github.com/rzaldana/blink.git
+[submodule "submodules/bash.Makefile"]
+	path = submodules/bash.Makefile
+	url = https://github.com/rzaldana/bash.Makefile.git
