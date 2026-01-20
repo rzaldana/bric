@@ -38,6 +38,8 @@ test_init_error_calls_http_post_with_correct_body_and_headers() {
     got_body="$body"
     got_url="$1"
     got_headers=( "${@:2}" )
+
+    echo "response"
   } 
 
   local want_body
@@ -50,12 +52,25 @@ test_init_error_calls_http_post_with_correct_body_and_headers() {
 }
 EOF
 
+  local stdout_file
+  local stderr_file
+  stdout_file="${tmpdir}/stdout"
+  stderr_file="${tmpdir}/stderr"
   
-  __lambda.api.init_error "error_msg" "myerrortype" "stacktrace1" "stacktrace2" "stacktrace3"
+  __lambda.api.init_error \
+    "error_msg" \
+    "myerrortype" \
+    "stacktrace1" \
+    "stacktrace2" \
+    "stacktrace3" \
+    >"$stdout_file" \
+    2>"$stderr_file"
   assert_no_diff "$want_body" <( echo "$got_body" )
   assert_equals "1" "${#got_headers[@]}"
   assert_equals "Content-Type: application/json" "${got_headers[0]}"
   assert_equals "$(__lambda.api.get_runtime_api_base_url)/runtime/init/error" "$got_url"
+  assert_no_diff <( echo -n "" ) "$stdout_file"
+  assert_no_diff <( echo -n "" ) "$stderr_file" 
 }
 
 test_invocation_error_calls_http_post_with_correct_body_and_headers() {
@@ -79,6 +94,8 @@ test_invocation_error_calls_http_post_with_correct_body_and_headers() {
     got_body="$body"
     got_url="$1"
     got_headers=( "${@:2}" )
+
+    echo "response"
   } 
 
   local want_body
@@ -91,11 +108,25 @@ test_invocation_error_calls_http_post_with_correct_body_and_headers() {
 }
 EOF
 
-  
-  __lambda.api.invocation_error "myrequestid" "error_msg" "myerrortype" "stacktrace1" "stacktrace2" "stacktrace3"
+ 
+  local stdout_file
+  local stderr_file
+  stdout_file="${tmpdir}/stdout"
+  stderr_file="${tmpdir}/stderr"
+  __lambda.api.invocation_error \
+    "myrequestid" \
+    "error_msg" \
+    "myerrortype" \
+    "stacktrace1" \
+    "stacktrace2" \
+    "stacktrace3" \
+    >"$stdout_file" \
+    2>"$stderr_file"
   assert_no_diff "$want_body" <( echo "$got_body" )
   assert_equals "1" "${#got_headers[@]}"
   assert_equals "Content-Type: application/json" "${got_headers[0]}"
   assert_equals "$(__lambda.api.get_runtime_api_base_url)/runtime/invocation/myrequestid/error" "$got_url"
+  assert_no_diff <( echo -n "" ) "$stdout_file"
+  assert_no_diff <( echo -n "" ) "$stderr_file" 
 }
 

@@ -37,6 +37,7 @@ __lambda.api.init_error() {
   __lambda.api.http.post \
     "$(__lambda.api.get_runtime_api_base_url)/runtime/init/error" \
     "Content-Type: application/json" \
+    >/dev/null \
 <<EOF
 {
   "errorMessage": "$error_message",
@@ -74,6 +75,7 @@ __lambda.api.invocation_error() {
   __lambda.api.http.post \
     "$(__lambda.api.get_runtime_api_base_url)/runtime/invocation/$aws_request_id/error" \
     "Content-Type: application/json" \
+    >/dev/null \
 <<EOF
 {
   "errorMessage": "$error_message",

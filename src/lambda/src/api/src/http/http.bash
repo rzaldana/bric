@@ -10,7 +10,6 @@ __lambda.api.http.get() {
     --show-error \
     --location \
     --dump-header "-" \
-    --fail \
     "$url"
 }
 
@@ -33,7 +32,6 @@ __lambda.api.http.post() {
     --show-error \
     --location \
     --dump-header "-" \
-    --fail \
     --data "@-" \
     --header "@"<( for header in "${headers[@]}"; do echo "$header"; done ) \
     "$url"
